@@ -97,7 +97,15 @@ func (s *SessionDescription) unmarshalOrigin(value string) error {
 		return fmt.Errorf("%w `o=%v`", errSDPInvalidSyntax, fields)
 	}
 
-	sessionID, err := strconv.ParseUint(fields[1], 10, 64)
+	var sessionID uint64
+	var err error
+
+	if strings.HasPrefix(fields[1], "0x") {
+		numStr := strings.Replace(fields[1], "0x", "", -1)
+		sessionID, err = strconv.ParseUint(numStr, 16, 64)
+	} else {
+		sessionID, err = strconv.ParseUint(fields[1], 10, 64)
+	}
 	if err != nil {
 		return fmt.Errorf("%w `%v`", errSDPInvalidNumericValue, fields[1])
 	}
